@@ -4,4 +4,10 @@ class Wall < ApplicationRecord
   has_many :votes, dependent: :restrict_with_exception
 
   validates :name, :starts_at, :ends_at, presence: true
+
+  scope :active, -> { where(active: true) }
+
+  def has_participant?(participant)
+    participants.exists?(participant.id)
+  end
 end

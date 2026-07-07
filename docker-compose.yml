@@ -3,14 +3,36 @@ services:
     build:
       context: ./backend
     container_name: bbb_backend
-    command: bin/rails server -b 0.0.0.0
+    command: bash -c "rm -f tmp/pids/server.pid && bin/rails server -b 0.0.0.0"
     ports:
       - "3000:3000"
     volumes:
       - ./backend:/app
+      - bundle_data:/usr/local/bundle
     environment:
       RAILS_ENV: development
       DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      DATABASE_USERNAME: postgres
+      DATABASE_PASSWORD: postgres
+      DATABASE_NAME: bbb_voting_development
+      REDIS_URL: redis://redis:6379/0
+    depends_on:
+      - postgres
+      - redis
+
+  sidekiq:
+    build:
+      context: ./backend
+    container_name: bbb_sidekiq
+    command: bundle exec sidekiq
+    volumes:
+      - ./backend:/app
+      - bundle_data:/usr/local/bundle
+    environment:
+      RAILS_ENV: development
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
       DATABASE_USERNAME: postgres
       DATABASE_PASSWORD: postgres
       DATABASE_NAME: bbb_voting_development
@@ -22,6 +44,7 @@ services:
   postgres:
     image: postgres:17
     container_name: bbb_postgres
+    restart: unless-stopped
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -34,8 +57,10 @@ services:
   redis:
     image: redis:7
     container_name: bbb_redis
+    restart: unless-stopped
     ports:
       - "6379:6379"
 
 volumes:
   postgres_data:
+  bundle_data:

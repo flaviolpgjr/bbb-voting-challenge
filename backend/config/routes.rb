@@ -1,8 +1,9 @@
 Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
-      get "health/index"
-      get "health", to: "health#index"
+      get :health, to: "health#index"
+      post :votes, to: "votes#create"
+      get :results, to: "results#index"
     end
   end
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
