@@ -22,33 +22,67 @@ RSpec.describe ResultService do
       let(:participant_one) { Participant.create!(name: "João") }
       let(:participant_two) { Participant.create!(name: "Maria") }
 
+      let(:hourly_totals) do
+        [
+          {
+            hour: "2026-07-07T18:00:00Z",
+            total_votes: 10,
+            participants: [
+              { id: participant_one.id, name: "João", votes: 7 },
+              { id: participant_two.id, name: "Maria", votes: 3 }
+            ]
+          }
+        ]
+      end
+
       before do
         WallParticipant.create!(wall: wall, participant: participant_one)
         WallParticipant.create!(wall: wall, participant: participant_two)
 
-        allow(VoteCounter).to receive(:total_wall_votes).with(wall_id: wall.id).and_return(10)
-        allow(VoteCounter).to receive(:total_for).with(wall_id: wall.id, participant_id: participant_one.id).and_return(7)
-        allow(VoteCounter).to receive(:total_for).with(wall_id: wall.id, participant_id: participant_two.id).and_return(3)
+        allow(VoteCounter).to receive(:total_wall_votes)
+          .with(wall_id: wall.id)
+          .and_return(10)
+
+        allow(VoteCounter).to receive(:total_for)
+          .with(wall_id: wall.id, participant_id: participant_one.id)
+          .and_return(7)
+
+        allow(VoteCounter).to receive(:total_for)
+          .with(wall_id: wall.id, participant_id: participant_two.id)
+          .and_return(3)
+
+        allow(VoteCounter).to receive(:hourly_totals)
+          .with(wall_id: wall.id, participants: [participant_one, participant_two])
+          .and_return(hourly_totals)
       end
 
-      it "returns vote totals and percentages" do
+      it "returns total votes, participant results and hourly totals" do
         result = described_class.new.call
 
         expect(result.status).to eq(:ok)
-        expect(result.payload[:total_votes]).to eq(10)
 
-        expect(result.payload[:participants]).to contain_exactly(
+        expect(result.payload).to eq(
           {
-            id: participant_one.id,
-            name: "João",
-            votes: 7,
-            percentage: 70.0
-          },
-          {
-            id: participant_two.id,
-            name: "Maria",
-            votes: 3,
-            percentage: 30.0
+            wall: {
+              id: wall.id,
+              name: "Paredão 1"
+            },
+            total_votes: 10,
+            participants: [
+              {
+                id: participant_one.id,
+                name: "João",
+                votes: 7,
+                percentage: 70.0
+              },
+              {
+                id: participant_two.id,
+                name: "Maria",
+                votes: 3,
+                percentage: 30.0
+              }
+            ],
+            hourly: hourly_totals
           }
         )
       end

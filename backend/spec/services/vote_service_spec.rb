@@ -47,7 +47,8 @@ RSpec.describe VoteService do
 
         expect(VoteCounter).to have_received(:increment).with(
           wall_id: wall.id,
-          participant_id: participant.id
+          participant_id: participant.id,
+          voted_at: kind_of(String)
         )
 
         expect(VotePersistenceJob).to have_received(:perform_later).with(

@@ -13,7 +13,8 @@ class VoteService
 
     VoteCounter.increment(
       wall_id: active_wall.id,
-      participant_id: participant.id
+      participant_id: participant.id,
+      voted_at: payload[:voted_at]
     )
 
     VotePersistenceJob.perform_later(payload)
