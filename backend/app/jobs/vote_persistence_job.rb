@@ -12,5 +12,20 @@ class VotePersistenceJob < ApplicationJob
       created_at: vote_data[:voted_at],
       updated_at: vote_data[:voted_at]
     )
+
+    Rails.logger.info(
+      event: "vote.persisted",
+      wall_id: vote_data[:wall_id],
+      participant_id: vote_data[:participant_id]
+    )
+  rescue StandardError => error
+    Rails.logger.error(
+      event: "vote.persistence_failed",
+      error: error.message,
+      error_class: error.class.name,
+      payload: vote_data
+    )
+
+    raise
   end
 end

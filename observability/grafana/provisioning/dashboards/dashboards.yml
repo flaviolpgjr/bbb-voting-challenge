@@ -1,0 +1,11 @@
+apiVersion: 1
+
+providers:
+  - name: BBB Voting Dashboards
+    orgId: 1
+    folder: BBB Voting
+    type: file
+    disableDeletion: false
+    editable: true
+    options:
+      path: /var/lib/grafana/dashboards

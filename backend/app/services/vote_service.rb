@@ -5,11 +5,15 @@ class VoteService
   end
 
   def call
+    VOTE_REQUESTS_COUNTER.increment
+
     return failure(:not_found, "No active wall found") unless active_wall
     return failure(:not_found, "Participant not found") unless participant
     return failure(:unprocessable_entity, "Participant does not belong to active wall") unless active_wall.has_participant?(participant)
 
     payload = vote_payload
+
+    log_vote_payload_created(payload)
 
     VoteCounter.increment(
       wall_id: active_wall.id,
@@ -18,6 +22,8 @@ class VoteService
     )
 
     VotePersistenceJob.perform_later(payload)
+
+    log_vote_accepted(payload)
 
     success(payload)
   end
@@ -45,6 +51,8 @@ class VoteService
   end
 
   def success(payload)
+    VOTES_ACCEPTED_COUNTER.increment
+
     ServiceResult.new(
       status: :accepted,
       payload: {
@@ -59,12 +67,43 @@ class VoteService
   end
 
   def failure(status, message)
+    VOTES_REJECTED_COUNTER.increment
+    log_vote_rejected(status, message)
+
     ServiceResult.new(
       status: status,
       payload: {
         success: false,
         error: message
       }
+    )
+  end
+
+  def log_vote_payload_created(payload)
+    Rails.logger.debug(
+      event: "vote.payload_created",
+      wall_id: payload[:wall_id],
+      participant_id: payload[:participant_id],
+      ip_address: payload[:ip_address]
+    )
+  end
+
+  def log_vote_accepted(payload)
+    Rails.logger.info(
+      event: "vote.accepted",
+      wall_id: payload[:wall_id],
+      participant_id: payload[:participant_id],
+      ip_address: payload[:ip_address]
+    )
+  end
+
+  def log_vote_rejected(status, message)
+    Rails.logger.warn(
+      event: "vote.rejected",
+      status: status,
+      reason: message,
+      participant_id: participant_id,
+      ip_address: request.remote_ip
     )
   end
 end

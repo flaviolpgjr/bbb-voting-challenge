@@ -33,6 +33,8 @@ gem "thruster", require: false
 gem "image_processing", "~> 1.2"
 gem "redis"
 gem "sidekiq"
+gem "rack-attack"
+gem "prometheus-client"
 
 # Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin Ajax possible
 # gem "rack-cors"

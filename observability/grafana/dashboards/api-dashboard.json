@@ -1,0 +1,38 @@
+{
+  "uid": "bbb-api",
+  "title": "BBB Voting - API",
+  "timezone": "browser",
+  "schemaVersion": 40,
+  "version": 1,
+  "refresh": "5s",
+  "panels": [
+    {
+      "type": "stat",
+      "title": "Vote Requests",
+      "gridPos": { "x": 0, "y": 0, "w": 6, "h": 4 },
+      "targets": [{ "expr": "vote_requests_total", "refId": "A" }],
+      "datasource": { "type": "prometheus", "uid": "prometheus" }
+    },
+    {
+      "type": "stat",
+      "title": "Accepted Votes",
+      "gridPos": { "x": 6, "y": 0, "w": 6, "h": 4 },
+      "targets": [{ "expr": "votes_accepted_total", "refId": "A" }],
+      "datasource": { "type": "prometheus", "uid": "prometheus" }
+    },
+    {
+      "type": "stat",
+      "title": "Rejected Votes",
+      "gridPos": { "x": 12, "y": 0, "w": 6, "h": 4 },
+      "targets": [{ "expr": "votes_rejected_total", "refId": "A" }],
+      "datasource": { "type": "prometheus", "uid": "prometheus" }
+    },
+    {
+      "type": "timeseries",
+      "title": "Vote Requests per Second",
+      "gridPos": { "x": 0, "y": 4, "w": 18, "h": 8 },
+      "targets": [{ "expr": "rate(vote_requests_total[1m])", "refId": "A" }],
+      "datasource": { "type": "prometheus", "uid": "prometheus" }
+    }
+  ]
+}
