@@ -19,6 +19,8 @@ services:
       REDIS_URL: redis://redis:6379/0
       RACK_ATTACK_LIMIT: 20
       RACK_ATTACK_PERIOD: 10
+      RAILS_MAX_THREADS: 10
+      WEB_CONCURRENCY: 1
     depends_on:
       - postgres
       - redis

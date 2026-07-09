@@ -3,22 +3,63 @@
   "title": "BBB Voting - Availability",
   "timezone": "browser",
   "schemaVersion": 40,
-  "version": 1,
+  "version": 3,
   "refresh": "5s",
   "panels": [
     {
       "type": "stat",
-      "title": "API Up",
+      "title": "API Availability (%)",
       "gridPos": { "x": 0, "y": 0, "w": 6, "h": 4 },
-      "targets": [{ "expr": "up{job=\"bbb_backend\"}", "refId": "A" }],
-      "datasource": { "type": "prometheus", "uid": "prometheus" }
+      "targets": [{ "expr": "up{job=\"bbb_backend\"} * 100", "refId": "A" }],
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100
+        }
+      }
+    },
+    {
+      "type": "stat",
+      "title": "SLO - Availability 99.9%",
+      "gridPos": { "x": 6, "y": 0, "w": 6, "h": 4 },
+      "targets": [
+        {
+          "expr": "avg_over_time(up{job=\"bbb_backend\"}[5m]) * 100",
+          "refId": "A"
+        }
+      ],
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "yellow", "value": 99.9 },
+              { "color": "green", "value": 100 }
+            ]
+          }
+        }
+      }
     },
     {
       "type": "timeseries",
-      "title": "API Availability",
+      "title": "API Availability Over Time (%)",
       "gridPos": { "x": 0, "y": 4, "w": 18, "h": 8 },
-      "targets": [{ "expr": "up{job=\"bbb_backend\"}", "refId": "A" }],
-      "datasource": { "type": "prometheus", "uid": "prometheus" }
+      "targets": [{ "expr": "up{job=\"bbb_backend\"} * 100", "refId": "A" }],
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100
+        }
+      }
     }
   ]
 }

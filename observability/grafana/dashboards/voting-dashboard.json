@@ -1,37 +1,75 @@
 {
   "uid": "bbb-voting",
-  "title": "BBB Voting - Voting Metrics",
+  "title": "BBB Voting - Vote SLO",
   "timezone": "browser",
   "schemaVersion": 40,
-  "version": 1,
+  "version": 3,
   "refresh": "5s",
   "panels": [
     {
-      "type": "timeseries",
-      "title": "Accepted Votes Over Time",
-      "gridPos": { "x": 0, "y": 0, "w": 12, "h": 8 },
+      "type": "stat",
+      "title": "SLI - Vote Success Rate (%)",
+      "gridPos": { "x": 0, "y": 0, "w": 8, "h": 4 },
       "targets": [
-        { "expr": "increase(votes_accepted_total[5m])", "refId": "A" }
+        {
+          "expr": "(votes_accepted_total / vote_requests_total) * 100",
+          "refId": "A"
+        }
       ],
-      "datasource": { "type": "prometheus", "uid": "prometheus" }
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100
+        }
+      }
+    },
+    {
+      "type": "stat",
+      "title": "SLO - Vote Success 99%",
+      "gridPos": { "x": 8, "y": 0, "w": 8, "h": 4 },
+      "targets": [
+        {
+          "expr": "(votes_accepted_total / vote_requests_total) * 100",
+          "refId": "A"
+        }
+      ],
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "yellow", "value": 99 },
+              { "color": "green", "value": 100 }
+            ]
+          }
+        }
+      }
     },
     {
       "type": "timeseries",
-      "title": "Rejected Votes Over Time",
-      "gridPos": { "x": 12, "y": 0, "w": 12, "h": 8 },
+      "title": "Vote Success Rate Over Time (%)",
+      "gridPos": { "x": 0, "y": 4, "w": 24, "h": 8 },
       "targets": [
-        { "expr": "increase(votes_rejected_total[5m])", "refId": "A" }
+        {
+          "expr": "(votes_accepted_total / vote_requests_total) * 100",
+          "refId": "A"
+        }
       ],
-      "datasource": { "type": "prometheus", "uid": "prometheus" }
-    },
-    {
-      "type": "gauge",
-      "title": "Acceptance Ratio",
-      "gridPos": { "x": 0, "y": 8, "w": 8, "h": 6 },
-      "targets": [
-        { "expr": "votes_accepted_total / vote_requests_total", "refId": "A" }
-      ],
-      "datasource": { "type": "prometheus", "uid": "prometheus" }
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100
+        }
+      }
     }
   ]
 }
