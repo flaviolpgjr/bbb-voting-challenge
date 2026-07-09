@@ -72,4 +72,5 @@ Rails.application.configure do
   # config.generators.apply_rubocop_autocorrect_after_generate!
   config.hosts << "backend"
   config.hosts << "backend:3000"
+  config.log_level = ENV.fetch("LOG_LEVEL", "debug").to_sym
 end

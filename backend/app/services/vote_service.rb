@@ -1,12 +1,16 @@
 class VoteService
-  def initialize(participant_id:, request:)
+  def initialize(participant_id:, request:, website: nil, rendered_at: nil)
     @participant_id = participant_id
     @request = request
+    @website = website
+    @rendered_at = rendered_at
   end
 
   def call
     VOTE_REQUESTS_COUNTER.increment
 
+    return failure(:unprocessable_entity, "Bot detected") if website.present?
+    return failure(:unprocessable_entity, "Vote submitted too quickly") if submitted_too_quickly?
     return failure(:not_found, "No active wall found") unless active_wall
     return failure(:not_found, "Participant not found") unless participant
     return failure(:unprocessable_entity, "Participant does not belong to active wall") unless active_wall.has_participant?(participant)
@@ -30,7 +34,7 @@ class VoteService
 
   private
 
-  attr_reader :participant_id, :request
+  attr_reader :participant_id, :request, :website, :rendered_at
 
   def active_wall
     @active_wall ||= Wall.active.first
@@ -105,5 +109,13 @@ class VoteService
       participant_id: participant_id,
       ip_address: request.remote_ip
     )
+  end
+
+  def submitted_too_quickly?
+  return false if rendered_at.blank?
+
+    elapsed_seconds = Time.current.to_f - (rendered_at.to_f / 1000.0)
+
+    elapsed_seconds < 1.5
   end
 end

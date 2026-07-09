@@ -2,7 +2,9 @@ class Api::V1::VotesController < ApplicationController
   def create
     result = VoteService.new(
       participant_id: vote_params[:participant_id],
-      request: request
+      request: request,
+      website: vote_params[:website],
+      rendered_at: vote_params[:rendered_at]
     ).call
 
     render json: result.payload, status: result.status
@@ -11,6 +13,6 @@ class Api::V1::VotesController < ApplicationController
   private
 
   def vote_params
-    params.permit(:participant_id)
+    params.permit(:participant_id, :website, :rendered_at)
   end
 end

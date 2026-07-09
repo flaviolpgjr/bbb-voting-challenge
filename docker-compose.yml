@@ -17,9 +17,23 @@ services:
       DATABASE_PASSWORD: postgres
       DATABASE_NAME: bbb_voting_development
       REDIS_URL: redis://redis:6379/0
+      RACK_ATTACK_LIMIT: 20
+      RACK_ATTACK_PERIOD: 10
     depends_on:
       - postgres
       - redis
+
+  frontend:
+    image: nginx:1.27-alpine
+    container_name: bbb_frontend
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    volumes:
+      - ./frontend:/usr/share/nginx/html:ro
+      - ./frontend/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - backend
 
   sidekiq:
     build:
@@ -60,6 +74,8 @@ services:
     restart: unless-stopped
     ports:
       - "6379:6379"
+    volumes:
+      - redis_data:/data
 
   prometheus:
     image: prom/prometheus:v3.0.1
@@ -91,5 +107,6 @@ services:
 
 volumes:
   postgres_data:
+  redis_data:
   bundle_data:
   grafana_data:

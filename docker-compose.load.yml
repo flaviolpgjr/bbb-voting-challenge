@@ -1,0 +1,12 @@
+services:
+  backend:
+    environment:
+      RACK_ATTACK_LIMIT: 100000
+      RACK_ATTACK_PERIOD: 60
+      RAILS_MAX_THREADS: 16
+      WEB_CONCURRENCY: 8
+      LOG_LEVEL: warn
+
+  sidekiq:
+    environment:
+      LOG_LEVEL: warn

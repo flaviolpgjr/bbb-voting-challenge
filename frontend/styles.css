@@ -1,0 +1,43 @@
+body {
+  background-color: #f8f9fa;
+}
+
+header h1 {
+  color: #6610f2;
+}
+
+.card {
+  border: none;
+  border-radius: 12px;
+}
+
+.card-header {
+  font-weight: 600;
+}
+
+.progress {
+  height: 22px;
+}
+
+.progress-bar {
+  font-weight: 600;
+}
+
+#hourlyResults table {
+  margin-bottom: 0;
+}
+
+.participant-card {
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.participant-card:hover {
+  box-shadow: 0 0.25rem 1rem rgba(0, 0, 0, 0.08);
+}
+
+.selected-card {
+  box-shadow: 0 0.25rem 1rem rgba(13, 110, 253, 0.18);
+}
